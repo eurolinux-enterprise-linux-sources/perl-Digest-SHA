@@ -1,7 +1,7 @@
 Name:           perl-Digest-SHA
 Epoch:          1
 Version:        5.85
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        Perl extension for SHA-1/224/256/384/512
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -72,6 +72,12 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1:5.85-3
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1:5.85-2
+- Mass rebuild 2013-12-27
+
 * Fri Jun 28 2013 Petr Pisar <ppisar@redhat.com> - 1:5.85-1
 - 5.85 bump
 
