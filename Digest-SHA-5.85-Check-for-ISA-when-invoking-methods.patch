@@ -1,0 +1,68 @@
+From c898bd4f5880bd7ddbf5987024c2748eae3d88a7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20P=C3=ADsa=C5=99?= <ppisar@redhat.com>
+Date: Wed, 12 Mar 2014 10:17:16 +0100
+Subject: [PATCH] Check for ISA when invoking methods
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+After:
+
+use Digest::SHA;
+my $d=Digest::SHA->add(qq(a));
+
+calling $d->hashsize() and other methods resulted in crash.
+
+This is relevant patch from Digest-SHA-5.87.
+
+Perl RT#121421
+<https://bugzilla.redhat.com/show_bug.cgi?id=1075478>
+
+Signed-off-by: Petr Písař <ppisar@redhat.com>
+---
+ SHA.xs | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/SHA.xs b/SHA.xs
+index 3caf8ef..69908a0 100644
+--- a/SHA.xs
++++ b/SHA.xs
+@@ -34,6 +34,8 @@ shaclose(s)
+ CODE:
+ 	RETVAL = shaclose(s);
+ 	sv_setiv(SvRV(ST(0)), 0);
++OUTPUT:
++	RETVAL
+ 
+ int
+ shadump(file, s)
+@@ -186,6 +188,8 @@ PREINIT:
+ 	SHA *state;
+ 	int result;
+ PPCODE:
++	if (!sv_isa(self, "Digest::SHA"))
++		XSRETURN_UNDEF;
+ 	state = INT2PTR(SHA *, SvIV(SvRV(SvRV(self))));
+ 	result = ix ? shaalg(state) : shadsize(state) << 3;
+ 	ST(0) = sv_2mortal(newSViv(result));
+@@ -200,6 +204,8 @@ PREINIT:
+ 	STRLEN len;
+ 	SHA *state;
+ PPCODE:
++	if (!sv_isa(self, "Digest::SHA"))
++		XSRETURN_UNDEF;
+ 	state = INT2PTR(SHA *, SvIV(SvRV(SvRV(self))));
+ 	for (i = 1; i < items; i++) {
+ 		data = (unsigned char *) (SvPVbyte(ST(i), len));
+@@ -224,6 +230,8 @@ PREINIT:
+ 	SHA *state;
+ 	char *result;
+ PPCODE:
++	if (!sv_isa(self, "Digest::SHA"))
++		XSRETURN_UNDEF;
+ 	state = INT2PTR(SHA *, SvIV(SvRV(SvRV(self))));
+ 	shafinish(state);
+ 	len = 0;
+-- 
+1.8.5.3
+

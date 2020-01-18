@@ -1,7 +1,7 @@
 Name:           perl-Digest-SHA
 Epoch:          1
 Version:        5.85
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Perl extension for SHA-1/224/256/384/512
 License:        GPL+ or Artistic
 Group:          Development/Libraries
@@ -10,6 +10,9 @@ Source0:        http://www.cpan.org/authors/id/M/MS/MSHELOR/Digest-SHA-%{version
 # Since 5.80, upstream overrides CFLAGS because they think it improves
 # performance. Revert it.
 Patch0:         Digest-SHA-5.84-Reset-CFLAGS.patch
+# Fix possible crash on uninitialized object, fixed in 5.87, bug #1189039,
+# RT#121421
+Patch1:         Digest-SHA-5.85-Check-for-ISA-when-invoking-methods.patch
 BuildRequires:  perl
 BuildRequires:  perl(Config)
 BuildRequires:  perl(ExtUtils::MakeMaker)
@@ -47,6 +50,7 @@ handle all types of input, including partial-byte data.
 %prep
 %setup -q -n Digest-SHA-%{version}
 %patch0 -p1
+%patch1 -p1
 chmod -x examples/*
 perl -MExtUtils::MakeMaker -e 'ExtUtils::MM_Unix->fixin(q{examples/dups})'
 
@@ -72,6 +76,9 @@ make test
 %{_mandir}/man3/*
 
 %changelog
+* Wed Feb 04 2015 Petr Pisar <ppisar@redhat.com> - 1:5.85-4
+- Fix possible crash on uninitialized object (bug #1189039)
+
 * Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1:5.85-3
 - Mass rebuild 2014-01-24
 
